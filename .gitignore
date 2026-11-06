@@ -1,0 +1,9 @@
+dist/
+.venv/
+__pycache__/
+.DS_Store
+# 写真・購入履歴などの個人のものは置かない
+private/
+*.jpg
+*.jpeg
+*.heic

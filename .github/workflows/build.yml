@@ -1,0 +1,48 @@
+# routine.yaml からページ・画像・PDF を作って GitHub Pages に出す。
+# 毎朝 4:30(日本時間)にも作り直すので、dashboard.png はその日の曜日の夜で出る。
+name: build
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "30 19 * * *" # 19:30 UTC = 4:30 JST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: 日本語フォント
+        run: sudo apt-get update -q && sudo apt-get install -y -q fonts-noto-cjk
+      - name: ページを作る
+        run: uv run build.py
+      - name: ブラウザを入れる
+        run: uv run --group render playwright install --with-deps chromium
+      - name: 画像と PDF を作る(はみ出しの確認つき)
+        run: uv run --group render render.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,12 @@
+[project]
+name = "skincare-routine"
+version = "0.1.0"
+description = "スキンケアルーティンのダッシュボードと手引き"
+requires-python = ">=3.12"
+dependencies = ["jinja2>=3.1", "pyyaml>=6.0"]
+
+[dependency-groups]
+render = ["playwright>=1.50"]
+
+[tool.uv]
+package = false

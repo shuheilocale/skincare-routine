@@ -1,0 +1,11 @@
+{% macro steps(list, cls="steps") %}
+<ol class="{{ cls }}">
+  {% for s in list %}
+  <li{% if s.from %} data-from="{{ s.from }}"{% endif %}>
+    <span class="t">{{ s.text }}</span>
+    {% if s.from_label %}<span class="from">{{ s.from_label }}</span>{% endif %}
+    {% if s.note %}<span class="n">{{ s.note }}</span>{% endif %}
+  </li>
+  {% endfor %}
+</ol>
+{% endmacro %}

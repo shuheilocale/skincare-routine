@@ -1,0 +1,178 @@
+{% from "_steps.j2" import steps %}
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>スキンケア</title>
+<style>
+:root {
+  --bg: #111315; --panel: #1b1e21; --line: #2c3035; --text: #e9ecef; --sub: #a3abb3; --faint: #6c757d;
+  --rs: #f08c4a; --acid: #5ea8f0; --retinol: #a58cf5; --rest: #5cc27a; --warn: #f5c451;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: max(14px, min(1.2vw, 1.95vh)); }
+body {
+  background: var(--bg); color: var(--text); line-height: 1.4;
+  font-family: "Hiragino Sans", "Noto Sans CJK JP", "Noto Sans JP", sans-serif;
+  height: 100vh; overflow: hidden; padding: 1.2rem 1.4rem;
+  display: grid; grid-template-rows: auto 1fr; gap: 0.9rem;
+}
+header { display: flex; align-items: baseline; gap: 1.2rem; }
+header h1 { font-size: 1.25rem; font-weight: 600; color: var(--sub); }
+header .date { font-size: 1.25rem; font-weight: 600; }
+header .rule { margin-left: auto; font-size: 0.8rem; color: var(--warn); border: 1px solid #5a4a1d; border-radius: 99px; padding: 0.2rem 0.9rem; }
+main { display: grid; grid-template-columns: 1.3fr 1fr; gap: 0.9rem; min-height: 0; }
+.col { display: flex; flex-direction: column; gap: 0.9rem; min-height: 0; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 0.7rem; padding: 0.9rem 1.1rem; }
+.panel h2 { font-size: 0.8rem; color: var(--sub); font-weight: 600; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+
+/* 今夜 */
+.tonight { flex: 1; border-top: 0.35rem solid var(--c); display: none; }
+.tonight.on { display: block; }
+.tonight .name { font-size: 1.9rem; font-weight: 700; color: var(--c); margin-bottom: 0.6rem; }
+.tonight .name small { font-size: 1.1rem; color: var(--sub); font-weight: 600; margin-right: 0.6rem; }
+.steps { list-style: none; counter-reset: s; }
+.steps li { counter-increment: s; position: relative; padding-left: 2.1em; margin: 0.35em 0; }
+.steps li::before {
+  content: counter(s); position: absolute; left: 0; top: 0.05em;
+  width: 1.5em; height: 1.5em; border-radius: 50%; display: grid; place-items: center;
+  background: var(--text); color: var(--bg); font-size: 0.85em; font-weight: 700;
+}
+.tonight .steps { font-size: 1.8rem; }
+.steps .n { display: block; font-size: 0.62em; color: var(--sub); }
+.from { font-size: 0.6em; color: var(--warn); border: 1px solid currentColor; border-radius: 99px; padding: 0 0.6em; margin-left: 0.4em; vertical-align: 0.15em; white-space: nowrap; }
+li.later .t { color: var(--faint); }
+li.started .from { display: none; }
+.why { font-size: 0.8rem; color: var(--sub); margin-top: 0.7rem; padding-top: 0.6rem; border-top: 1px solid var(--line); }
+
+/* 朝: 横に並べる */
+.morning .steps { display: flex; flex-wrap: wrap; gap: 0.3rem 1.4rem; font-size: 1.05rem; }
+.morning .steps li { margin: 0; }
+.morning .note { font-size: 0.7rem; color: var(--sub); margin-top: 0.5rem; }
+
+/* 1週間 */
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.35rem; }
+.week .d { text-align: center; border-radius: 0.45rem; padding: 0.35rem 0.1rem; border: 1px solid var(--line); }
+.week .d b { display: block; font-size: 0.95rem; }
+.week .d span { display: block; font-size: 0.62rem; color: var(--c); font-weight: 600; line-height: 1.25; }
+.week .d.today { background: var(--c); border-color: var(--c); }
+.week .d.today b, .week .d.today span { color: var(--bg); }
+
+.side .steps { font-size: 0.85rem; }
+.side .note { font-size: 0.68rem; color: var(--sub); margin-top: 0.4rem; }
+.side h3 { font-size: 0.75rem; color: var(--sub); font-weight: 600; margin: 0.6rem 0 0.2rem; }
+.plan { list-style: none; font-size: 0.8rem; }
+.plan li { display: grid; grid-template-columns: 6.2em 1fr; gap: 0.5rem; margin: 0.3rem 0; }
+.plan .when { color: var(--warn); font-weight: 600; }
+.plan .watch { display: block; font-size: 0.85em; color: var(--sub); }
+.plan li.done { display: none; }
+.body-panel { flex: 1; min-height: 0; overflow: hidden; }
+
+.c-rs { --c: var(--rs); } .c-acid { --c: var(--acid); } .c-retinol { --c: var(--retinol); } .c-rest { --c: var(--rest); }
+
+/* 縦長の画面(スマホなど)は縦に積む */
+@media (max-aspect-ratio: 1/1) {
+  html { font-size: 16px; }
+  body { height: auto; overflow: visible; padding: 1rem; }
+  header { flex-wrap: wrap; }
+  header .rule { margin-left: 0; }
+  main { grid-template-columns: 1fr; }
+  .tonight .steps { font-size: 1.25rem; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>{{ d.title }}</h1>
+  <div class="date" id="date"></div>
+  <div class="rule">{{ d.rule }}</div>
+</header>
+<main>
+  <div class="col">
+    {% for key, n in d.nights.items() %}
+    <section class="panel tonight c-{{ n.color }}" data-night="{{ key }}">
+      <div class="name"><small id="label-{{ key }}">今夜</small>{{ n.name }}</div>
+      {{ steps(n.steps) }}
+      <p class="why">{{ n.why }}</p>
+    </section>
+    {% endfor %}
+    <section class="panel morning">
+      <h2>朝(毎日同じ)</h2>
+      {{ steps(d.morning.steps) }}
+      <p class="note">{{ d.morning.note }}</p>
+    </section>
+  </div>
+  <div class="col side">
+    <section class="panel">
+      <h2>1週間の夜</h2>
+      <div class="week">
+        {% for w in d.week_list %}
+        <div class="d c-{{ w.night.color }}" data-day="{{ w.day }}"><b>{{ w.ja }}</b><span>{{ w.night.short }}</span></div>
+        {% endfor %}
+      </div>
+    </section>
+    <section class="panel body-panel">
+      <h2>体・背中</h2>
+      {{ steps(d.body.daily.steps) }}
+      <p class="note">{{ d.body.daily.note }}</p>
+      <h3>{{ d.body.mist.title }}</h3>
+      {{ steps(d.body.mist.steps) }}
+    </section>
+    <section class="panel">
+      <h2>これから足すもの(1つ足したら1週間は様子見)</h2>
+      <ol class="plan">
+        {% for p in d.plan %}
+        <li data-plan="{{ p.from }}"><span class="when">{{ p.label }}</span><span>{{ p.what }}<span class="watch">{{ p.watch }}</span></span></li>
+        {% endfor %}
+      </ol>
+    </section>
+  </div>
+</main>
+<script>
+const DATA = {{ page_json | safe }};
+const DAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+const DAY_JA = ["日", "月", "火", "水", "木", "金", "土"];
+
+// 東京の日付。朝5時までは前の日の夜として扱う。?date=2026-11-07 で日付を差し替えられる(確かめる用)
+function today() {
+  const q = new URLSearchParams(location.search).get("date");
+  if (q && /^\d{4}-\d{2}-\d{2}$/.test(q)) return { iso: q, date: new Date(q + "T12:00:00Z") };
+  const tokyo = new Date(Date.now() + 9 * 3600e3 - 5 * 3600e3);
+  return { iso: tokyo.toISOString().slice(0, 10), date: tokyo };
+}
+
+function render() {
+  const t = today();
+  const dow = t.date.getUTCDay();
+  const day = DAYS[dow];
+  document.getElementById("date").textContent =
+    `${t.date.getUTCMonth() + 1}月${t.date.getUTCDate()}日(${DAY_JA[dow]})`;
+
+  const night = DATA.week[day];
+  document.querySelectorAll(".tonight").forEach(el => el.classList.toggle("on", el.dataset.night === night));
+  document.querySelectorAll(".week .d").forEach(el => el.classList.toggle("today", el.dataset.day === day));
+
+  // 始める日が来た手順は印を消す。まだのものは薄くする
+  document.querySelectorAll("li[data-from]").forEach(el => {
+    const started = t.iso >= el.dataset.from;
+    el.classList.toggle("started", started);
+    el.classList.toggle("later", !started);
+  });
+  // これから足すもの: 始めて1週間たったものは消す
+  document.querySelectorAll("li[data-plan]").forEach(el => {
+    const f = el.dataset.plan;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(f)) return;
+    const done = new Date(f + "T12:00:00Z").getTime() + 7 * 86400e3 <= t.date.getTime();
+    el.classList.toggle("done", done);
+  });
+}
+
+render();
+setInterval(render, 60 * 1000);
+// 壁に出しっぱなしにしたとき、更新された中身を拾うため 6 時間ごとに読み直す
+setTimeout(() => location.reload(), 6 * 3600 * 1000);
+</script>
+</body>
+</html>
