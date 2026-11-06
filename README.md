@@ -32,8 +32,11 @@ open "dist/index.html?date=2026-11-07"                   # 日付を差し替え
 
 ダッシュボードは外部のフォント・スクリプトを読まない1枚の HTML。
 
-- そのまま出すなら、Chromium のキオスクモードで上の URL を開く。ページは6時間ごとに自分で読み直す。日本語フォント(`fonts-noto-cjk`)が要る
-- 家の壁の画面(home-network の wall)のページの1つとして組み込むなら、`routine.json` をサーバー側で取ってきて描く
+家の壁の画面(`~/99_private/home-network` の wall)が、右の大枠の1ページとして出している。wall のサーバーが `routine.json` を1時間ごとに取ってきて描くので、ここを push すれば Pi 側の作業は要らない。
+
+wall が読んでいるのは `week`、`nights` の `name`・`short`・`color`・`steps`、`morning.steps`、`rule`、`updated`。これらの名前や形を変えるときは、wall の `netwatch/wall/skincare.py` も直す。`color` は `rs` / `acid` / `retinol` / `rest` のどれか(ほかは wall では `rest` の色になる)。
+
+ダッシュボードの HTML を単体で出すこともできる(Chromium のキオスクモードで上の URL を開く。6時間ごとに自分で読み直す。日本語フォント `fonts-noto-cjk` が要る)。
 
 ## 置かないもの
 
